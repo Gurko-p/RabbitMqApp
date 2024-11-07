@@ -1,0 +1,31 @@
+services:
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - my_network
+
+  sender:
+    build:
+      context: ./MessageProducerApp/MessageProducerApp/
+    depends_on:
+      - rabbitmq
+    networks:
+      - my_network
+    restart: on-failure
+
+  receiver:
+    build:
+      context: ./MessageReceiverApp/MessageReceiverApp/
+    depends_on:
+      - rabbitmq
+      - sender
+    networks:
+      - my_network
+    restart: on-failure
+
+networks:
+  my_network:
+    driver: bridge
